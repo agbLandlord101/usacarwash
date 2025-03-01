@@ -79,7 +79,7 @@ const TaxRefundPage: React.FC = () => {
             href="/info"
             className="bg-green-500 text-black px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300 text-sm"
           >
-            Apply Now
+            Apply
           </a>
           <button onClick={toggleMenu} className="text-black focus:outline-none">
             <svg
@@ -96,11 +96,7 @@ const TaxRefundPage: React.FC = () => {
 
         {/* Desktop Navigation */}
         <nav className="nav-menu hidden md:flex space-x-8 font-medium text-sm md:text-base">
-          <a href="/products" className="hover:text-green-500 transition duration-300">Products</a>
-          <a href="/benefits" className="hover:text-green-500 transition duration-300">Benefits</a>
-          <a href="/partners" className="hover:text-green-500 transition duration-300">Partners</a>
-          <a href="/about-us" className="hover:text-green-500 transition duration-300">About Us</a>
-          <a href="/help" className="hover:text-green-500 transition duration-300">Help</a>
+        
         </nav>
 
         <div className="hidden md:flex space-x-4">
@@ -117,11 +113,7 @@ const TaxRefundPage: React.FC = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <nav className="md:hidden bg-white text-black space-y-4 p-4">
-          {["Products", "Benefits", "Partners", "About Us", "Help", "Login"].map((item) => (
-            <a key={item} href="/login" className="block hover:text-green-500">
-              {item}
-            </a>
-          ))}
+          
           <a href="/registercard" className="block bg-black text-white px-5 py-2 rounded-lg hover:bg-green-500 transition duration-300">
             Activate your card
           </a>
@@ -189,7 +181,7 @@ const TaxRefundPage: React.FC = () => {
 
     
     <a
-      href="/login"
+      href="/info"
       className="inline-block bg-green-500 text-black px-8 py-3 rounded-lg hover:bg-green-600 transition duration-300 text-lg font-semibold"
     >
       Join Now
@@ -226,7 +218,7 @@ const TaxRefundPage: React.FC = () => {
       href="/info"
       className="inline-block bg-green-500 text-black px-8 py-3 rounded-lg hover:bg-green-600 transition duration-300 text-lg font-semibold"
     >
-      Apply Now
+      Apply
     </a>
   </div>
   <div className="w-full md:w-1/2">

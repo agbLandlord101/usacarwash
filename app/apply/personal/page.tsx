@@ -152,7 +152,7 @@ const PersonalInformationForm = () => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleChange("email", e.target.value)}
-                className="w-full mt-2 border rounded-lg p-3"
+                className="w-full mt-2 border rounded-lg p-3 text-black bg-white"
                 required
               />
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}

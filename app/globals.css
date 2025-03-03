@@ -1,9 +1,37 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap');
 
-@theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+/* Autofill styling for WebKit browsers (Chrome, Safari) */
+input:-webkit-autofill {
+  color: #000 !important;
+  background-color: transparent !important;
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  border: 1px solid #ccc !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
+
+/* Placeholder styling across all browsers */
+input::placeholder,
+textarea::placeholder {
+  color: #000 !important;  /* Makes placeholder text black */
+  opacity: 1;  /* Full opacity for visibility */
+}
+
+/* Focused input styling */
+input:focus,
+textarea:focus {
+  outline: none;  /* Removes default outline */
+  border-color: #2563eb;  /* Adds a blue border on focus */
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.5);  /* Adds a blue shadow ring */
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
 
 :root {
   --background: #ffffff;
@@ -20,5 +48,5 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  
 }

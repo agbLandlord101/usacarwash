@@ -75,11 +75,25 @@ const PersonalInformationForm = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <main className="flex-grow container mx-auto mt-12 px-4">
-        <div className="max-w-lg mx-auto bg-white p-10 shadow-xl rounded-lg border-t-4 border-green-500">
-          <h1 className="text-3xl font-semibold text-gray-800 text-center mb-6">Personal Information</h1>
-          <form onSubmit={handleSubmit}>
-            {/* Name Fields */}
+    {/* Sticky Header Section */}
+    <header className="bg-green-600 shadow-md sticky top-0 z-10">
+      <div className="max-w-3xl mx-auto p-4 flex items-center">
+        <img src="/logogreen.svg" alt="Logo" className="h-8 mr-3" />
+        <div className="flex-1 ml-2">
+          <div className="h-2 bg-green-500 rounded-full mt-1">
+            <div className="h-full bg-green-200 rounded-full transition-all duration-300" />
+          </div>
+        </div>
+      </div>
+    </header>
+  
+    {/* Main Content */}
+    <main className="flex-grow container mx-auto mt-12 px-4">
+      <div className="max-w-lg mx-auto bg-white p-10 shadow-xl rounded-lg border-t-4 border-green-500">
+        {/* Title for Personal Information Form */}
+        <h1 className="text-3xl font-semibold text-gray-800 text-center mb-6">Personal Information</h1>
+        
+        <form onSubmit={handleSubmit}>
             <div className="mb-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -88,7 +102,7 @@ const PersonalInformationForm = () => {
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => handleChange("firstName", e.target.value)}
-                    className="w-full mt-2 border rounded-lg p-3"
+                    className="w-full mt-2 border rounded-lg p-3 text-black bg-white"
                     required
                   />
                   {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
@@ -99,7 +113,7 @@ const PersonalInformationForm = () => {
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => handleChange("lastName", e.target.value)}
-                    className="w-full mt-2 border rounded-lg p-3"
+                    className="w-full mt-2 border rounded-lg p-3 text-black bg-white"
                     required
                   />
                   {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}

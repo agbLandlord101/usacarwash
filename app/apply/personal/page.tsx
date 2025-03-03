@@ -195,7 +195,7 @@ const PersonalInformationForm = () => {
               <select
                 value={formData.gender}
                 onChange={(e) => handleChange("gender", e.target.value)}
-                className="w-full mt-2 border rounded-lg p-3"
+                className="text-black bg-white w-full mt-2 border rounded-lg p-3"
                 required
               >
                 <option value="">Select Gender</option>

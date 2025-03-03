@@ -159,7 +159,7 @@ const PersonalInformationForm = () => {
                   <select
                     value={formData.vehicleType}
                     onChange={(e) => setFormData({ ...formData, vehicleType: e.target.value })}
-                    className={`w-full mt-2 border ${errors.vehicleType ? "border-red-500" : "border-gray-300"} rounded-lg p-3`}
+                    className={`text-black bg-white w-full mt-2 border ${errors.vehicleType ? "border-red-500" : "border-gray-300"} rounded-lg p-3`}
                   >
                     <option value="">Select Vehicle Type</option>
                     <option value="Car">Car</option>

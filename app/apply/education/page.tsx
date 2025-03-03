@@ -127,7 +127,7 @@ const EducationHistoryForm = () => {
             </div>
 
             <button type="submit" className="w-full bg-green-500 text-white p-4 rounded-xl hover:bg-green-600">
-              Complete Application
+              Next
             </button>
           </form>
         </div>

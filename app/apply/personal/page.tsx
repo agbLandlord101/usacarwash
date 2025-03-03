@@ -178,7 +178,7 @@ const PersonalInformationForm = () => {
                 type="email"
                 value={formData.confirmEmail}
                 onChange={(e) => handleChange("confirmEmail", e.target.value)}
-                className="w-full mt-2 border rounded-lg p-3"
+                className="w-full mt-2 border rounded-lg p-3 text-black bg-white"
                 required
               />
               {errors.confirmEmail && <p className="text-red-500 text-sm mt-1">{errors.confirmEmail}</p>}
@@ -207,7 +207,7 @@ const PersonalInformationForm = () => {
               <input
                 value={formData.phone}
                 onChange={(e) => handleChange("phone", formatPhone(e.target.value))}
-                className="w-full mt-2 border rounded-lg p-3"
+                className="w-full mt-2 border rounded-lg p-3 text-black bg-white"
                 maxLength={14}
                 required
               />
@@ -220,7 +220,7 @@ const PersonalInformationForm = () => {
               <input
                 value={formData.ssn}
                 onChange={(e) => handleChange("ssn", formatSSN(e.target.value))}
-                className="w-full mt-2 border rounded-lg p-3"
+                className="w-full mt-2 border rounded-lg p-3 text-black bg-white"
                 maxLength={11}
                 required
               />

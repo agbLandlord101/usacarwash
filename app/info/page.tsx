@@ -242,7 +242,7 @@ const MultiStepForm = () => {
           <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Personal Information</h2>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 text-black bg-white">
               <InputField
                 label="First Name"
                 value={formData.firstName}

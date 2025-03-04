@@ -68,7 +68,7 @@ const SignUpPage: React.FC = () => {
       // Handle successful response
       const data = response.data;
       alert(`Success: ${data.message}`);
-      router.push("/confirm");
+      router.push("/profile");
     } catch (error: any) {
       console.error('Error signing up:', error);
       if (error.response) {

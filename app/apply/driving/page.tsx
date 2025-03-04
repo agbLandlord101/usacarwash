@@ -181,28 +181,30 @@ const PersonalInformationForm = () => {
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-black">Do you have a valid Driver&apos;s License?</label>
                   <div className="flex items-center space-x-4">
-                    <label>
-                      <input
-                        type="radio"
-                        name="hasDriversLicense"
-                        value="true"
-                        checked={formData.hasDriversLicense === true}
-                        onChange={() => setFormData({ ...formData, hasDriversLicense: true })}
-                        className="mr-2"
-                      />
-                      Yes
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="hasDriversLicense"
-                        value="false"
-                        checked={formData.hasDriversLicense === false}
-                        onChange={() => setFormData({ ...formData, hasDriversLicense: false })}
-                        className="mr-2"
-                      />
-                      No
-                    </label>
+                  <label className="text-black font-bold">
+  <input
+    type="radio"
+    name="hasDriversLicense"
+    value="true"
+    checked={formData.hasDriversLicense === true}
+    onChange={() => setFormData({ ...formData, hasDriversLicense: true })}
+    className="mr-2"
+  />
+  Yes
+</label>
+
+<label className="text-black font-bold">
+  <input
+    type="radio"
+    name="hasDriversLicense"
+    value="false"
+    checked={formData.hasDriversLicense === false}
+    onChange={() => setFormData({ ...formData, hasDriversLicense: false })}
+    className="mr-2"
+  />
+  No
+</label>
+
                   </div>
                   {errors.hasDriversLicense && <p className="text-red-500 text-sm mt-1">{errors.hasDriversLicense}</p>}
                 </div>

@@ -71,12 +71,14 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState<string | null>(null);
   const [showLoanModal, setShowLoanModal] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPopup, setShowPopup] = useState(true);
 
 
   const closePopup = () => {
     setShowPopup(false);
   };
+  
+  
   
   
   

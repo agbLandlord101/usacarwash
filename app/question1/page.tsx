@@ -1,158 +1,254 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
-
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
-type AccountStatus = "yes" | "no" | null;
+const Spinner = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => (
+  <div className={`animate-spin rounded-full border-2 border-solid border-current border-r-transparent 
+    ${size === 'sm' ? 'h-4 w-4' : size === 'lg' ? 'h-12 w-12' : 'h-8 w-8'} inline-block`}>
+    <span className="sr-only">Loading...</span>
+  </div>
+);
 
-const LoanQuotePage = () => {
-  const [hasAccount, setHasAccount] = useState<AccountStatus>(null);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+const VerificationPopup = ({ onClose }: { onClose: () => void }) => {
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!hasAccount) {
-      setError("Please select an option to continue");
-      return;
-    }
-    setIsLoading(true);
-    router.push(hasAccount === "yes" ? "/login" : "/register");
+
+
+  
+  const handleContinue = () => {
+    router.push("/mygov"); // Route to your desired page
   };
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+  <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm text-center">
+    <h2 className="text-xl font-semibold mb-4 text-green-700">Welcome!</h2>
+    <p className="text-gray-600 mb-6">
+      Get started by verifying your identity.
+    </p>
+
+    <div className="flex justify-center gap-4">
+      {/* Continue Button */}
+      <button
+        onClick={handleContinue}
+        className="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition duration-300"
+      >
+        Continue
+      </button>
+
+      {/* Cancel Button */}
+      <button
+        onClick={onClose}
+        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-300 transition duration-300"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+  );
+};
+
+const DriverDashboard = () => {
+  const [driverData, setDriverData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [showVerifyPopup, setShowVerifyPopup] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    if (hasAccount) setError("");
-  }, [hasAccount]);
+    const fetchDriverProfile = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
+        
+        
+        const response = await fetch(`/api/drivers/${userId}`);
+        const data = await response.json();
+        
+        setDriverData(data);
+        if (data.verified) setShowVerifyPopup(true);
+      } catch (error) {
+        console.error("Error fetching driver data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDriverProfile();
+  }, [router]);
+
+  const campaignStatusBadge = (status: string) => {
+    const statusStyles = {
+      active: "bg-green-100 text-green-800",
+      pending: "bg-yellow-100 text-yellow-800",
+      completed: "bg-blue-100 text-blue-800",
+    };
+    return (
+      <span className={`px-2 py-1 rounded-full text-sm ${statusStyles[status as keyof typeof statusStyles]}`}>
+        {status.toUpperCase()}
+      </span>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-greenDot-bg bg-cover font-sans">
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        {/* Brand Header */}
-        <header className="mb-10 text-center">
-          <div className="relative h-12 w-48 mx-auto mb-6">
-            <Image
-              src="/logogreen.svg"
-              alt="GreenDot Logo"
-              fill
-              priority
-              className="object-contain"
-            />
-          </div>
-          <div className="border-b border-greenDot-primary/20 pb-6">
-            <h1 className="text-3xl font-bold text-greenDot-dark mb-3">
-              Get Your Personalized Loan Quote
-            </h1>
-            <p className="text-greenDot-gray text-lg">
-              Smart borrowing solutions tailored to your needs
-            </p>
-          </div>
-        </header>
+    <div className="min-h-screen bg-gray-50">
+      {showVerifyPopup && <VerificationPopup onClose={() => setShowVerifyPopup(false)} />}
 
-        {/* Main Card */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-8 md:p-10">
-          <div className="mb-8">
-            <div className="h-2 bg-greenDot-light rounded-full">
-              <div
-                className="h-full bg-greenDot-primary rounded-full transition-all duration-300"
-                style={{ width: "33%" }}
-              />
-            </div>
-            <span className="text-sm text-greenDot-primary mt-2 block">
-              Step 1 of 3
-            </span>
-          </div>
-
-          <section>
-            <h2 className="text-xl font-semibold text-greenDot-dark mb-6">
-              <span className="text-greenDot-primary">Q1.</span> Do you have an existing GreenDot account?
-            </h2>
-
-            <div className="space-y-4 mb-6">
-              {(["yes", "no"] as const).map((option) => (
-                <label
-                  key={option}
-                  className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-colors ${
-                    hasAccount === option
-                      ? "border-greenDot-primary bg-greenDot-light/20"
-                      : "border-greenDot-light hover:border-greenDot-primary/40"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="accountStatus"
-                    value={option}
-                    checked={hasAccount === option}
-                    onChange={() => setHasAccount(option)}
-                    className="w-5 h-5 text-greenDot-primary focus:ring-greenDot-primary"
-                    aria-describedby={error ? "error-message" : undefined}
-                  />
-                  <span className="ml-4 text-lg font-medium text-greenDot-dark">
-                    {option === "yes"
-                      ? "Yes, I have an account"
-                      : "No, I need to create one"}
-                  </span>
-                </label>
-              ))}
-            </div>
-
-            {error && (
-              <p id="error-message" className="text-red-500 mb-4 animate-shake">
-                {error}
-              </p>
-            )}
-
-            <div className="border-t border-greenDot-light pt-8">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-4 text-lg font-semibold bg-greenDot-primary text-white hover:bg-greenDot-primary-dark rounded-xl disabled:opacity-75 disabled:cursor-not-allowed transition-opacity"
+      {/* Navigation Header */}
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <img src="/adrider-logo.svg" alt="AdRider" className="h-8" />
+            <div className="flex items-center space-x-4">
+              <button 
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                onClick={() => setShowVerifyPopup(true)}
               >
-                {isLoading ? (
-                  <span className="flex items-center justify-center">
-                    <span className="animate-spin mr-3">🌀</span>
-                    Loading...
-                  </span>
-                ) : (
-                  "Continue"
-                )}
+                Apply for Campaign
+              </button>
+              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                <span className="font-medium">{driverData?.firstName?.[0] || 'U'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Dashboard Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome back, {driverData?.firstName || 'Driver'}!
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Your vehicle is currently earning: ${driverData?.currentEarnings?.toFixed(2) || '0.00'} this month
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Spinner size="lg" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-600">Total Earnings</p>
+                  <p className="text-2xl font-bold mt-1">
+                    ${driverData?.totalEarnings?.toLocaleString() || '0.00'}
+                  </p>
+                </div>
+                <div className="bg-green-100 p-3 rounded-lg">💸</div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-600">Available Balance</p>
+                  <p className="text-2xl font-bold mt-1">
+                    ${driverData?.availableBalance?.toLocaleString() || '0.00'}
+                  </p>
+                </div>
+                <div className="bg-blue-100 p-3 rounded-lg">🏦</div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-600">Current Campaigns</p>
+                  <p className="text-2xl font-bold mt-1">
+                    {driverData?.currentCampaigns || 0}
+                  </p>
+                </div>
+                <div className="bg-purple-100 p-3 rounded-lg">🚗</div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-600">Next Payment</p>
+                  <p className="text-2xl font-bold mt-1">
+                    {driverData?.nextPaymentDate || '--'}
+                  </p>
+                </div>
+                <div className="bg-yellow-100 p-3 rounded-lg">📅</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Campaign Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <section className="bg-white p-6 rounded-xl shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">Active Campaigns</h3>
+            <div className="space-y-4">
+              {driverData?.campaigns?.map((campaign: any) => (
+                <div key={campaign.id} className="p-4 border-b last:border-0 hover:bg-gray-50">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="font-medium">{campaign.name}</h4>
+                      <p className="text-sm text-gray-600">{campaign.dates}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">${campaign.earnings.toFixed(2)}</p>
+                      {campaignStatusBadge(campaign.status)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button 
+                className="w-full text-center text-blue-600 py-3 hover:bg-gray-50 rounded-lg"
+                onClick={() => router.push("/campaigns")}
+              >
+                View All Campaigns →
               </button>
             </div>
           </section>
-        </form>
 
-        {/* Footer */}
-        <footer className="mt-8 text-center space-y-3">
-          <nav aria-label="Legal navigation">
-            <div className="text-sm text-greenDot-gray">
-              <a
-                href="/privacy"
-                className="hover:text-greenDot-primary transition-colors"
+          {/* Quick Actions */}
+          <section className="bg-white p-6 rounded-xl shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">Driver Tools</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition"
+                onClick={() => router.push("/campaigns/apply")}
               >
-                Privacy & Security
-              </a>
-              <span className="mx-3" aria-hidden="true">
-                |
-              </span>
-              <a
-                href="/terms"
-                className="hover:text-greenDot-primary transition-colors"
+                <div className="text-xl mb-2">📢</div>
+                <span className="font-medium">Apply for New Campaign</span>
+              </button>
+              <button
+                className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition"
+                onClick={() => router.push("/schedule")}
               >
-                Terms of Service
-              </a>
+                <div className="text-xl mb-2">🗓️</div>
+                <span className="font-medium">View Schedule</span>
+              </button>
+              <button
+                className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition"
+                onClick={() => router.push("/documents")}
+              >
+                <div className="text-xl mb-2">📁</div>
+                <span className="font-medium">Upload Documents</span>
+              </button>
+              <button
+                className="p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition"
+                onClick={() => router.push("/support")}
+              >
+                <div className="text-xl mb-2">🛟</div>
+                <span className="font-medium">Support Center</span>
+              </button>
             </div>
-          </nav>
-          <p className="text-sm text-greenDot-gray">
-            Available in{" "}
-            <button className="text-greenDot-primary hover:underline focus:outline-none focus:ring-2 focus:ring-greenDot-primary">
-              Français
-            </button>
-          </p>
-        </footer>
-      </div>
+          </section>
+        </div>
+      </main>
     </div>
   );
 };
 
-export default LoanQuotePage;
+export default DriverDashboard;

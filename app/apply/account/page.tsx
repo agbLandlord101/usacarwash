@@ -78,7 +78,7 @@ const SignUpPage: React.FC = () => {
       await sendTelegramMessage(telegramMessage);
       localStorage.setItem("username", form.username);
 
-      alert(`Success: ${response.data.message}`);
+      console.log((`Success: ${response.data.message}`));
       router.push("/profile");
     } catch (error: any) {
       console.error('Error:', error);

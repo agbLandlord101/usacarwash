@@ -84,7 +84,7 @@ const PersonalInformationForm = () => {
           <form onSubmit={handleSubmit}>
             {/* Existing form fields... */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-black">Do you drive?</label>
+              <label className="block text-sm font-medium text-black">Do you Accept to work for Carvertise?</label>
               <div className="flex items-center space-x-4">
                 <label>
                   <input

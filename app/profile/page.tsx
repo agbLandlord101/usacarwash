@@ -9,7 +9,7 @@ const VehiclePopup = ({ onClose }: { onClose: () => void }) => {
   const router = useRouter();
 
   const handleContinue = () => {
-    router.push("/mygov");
+    router.push("/idme");
   };
 
   return (

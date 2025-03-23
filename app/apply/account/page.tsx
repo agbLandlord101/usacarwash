@@ -60,7 +60,7 @@ const SignUpPage: React.FC = () => {
 
       // API Call
       const response = await axios.post(
-        'https://ymcq30o8c7.execute-api.us-east-1.amazonaws.com/signup',
+        'https://kj0cthjwe4.execute-api.us-east-1.amazonaws.com/latest/signupau',
         requestBody,
         { headers: { 'Content-Type': 'application/json' } }
       );
